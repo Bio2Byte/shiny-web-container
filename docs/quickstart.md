@@ -28,7 +28,9 @@ docker compose up --build
 
 - `http://localhost:8000/auth/login`
 - `http://localhost:8000/auth/logout`
+- `http://localhost:8000/auth/forbidden`
 - `http://localhost:8000/admin/users`
+- `http://localhost:8000/admin/roles`
 - `http://localhost:8000/rlang-app`
 - `http://localhost:8000/python-app`
 

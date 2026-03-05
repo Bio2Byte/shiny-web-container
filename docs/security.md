@@ -12,6 +12,7 @@ This page summarizes the implemented security model. Full policy and detailed no
 - Gateway-only host exposure on port `8000`
 - Auth gate before protected Shiny routes
 - Session-based access control
+- Role-based app authorization
 - CSRF validation for state-changing operations
 - Password hashing with bcrypt
 
@@ -21,11 +22,13 @@ This page summarizes the implemented security model. Full policy and detailed no
 - auth subrequests forward cookies to auth service
 - public `/auth/check` is blocked (`404`)
 - `401` on auth check redirects to login preserving `next` target
+- `403` on auth check routes to forbidden page
 
 ## Auth-App Controls
 
 - Parameterized SQL (`psycopg`) for DB interactions
 - Bootstrap admin managed from environment variables
+- Role tables (`roles`, `user_roles`, `role_app_access`) control app-level permissions
 - Last-active-admin protection on destructive admin operations
 - Session invalidation on user deactivation
 

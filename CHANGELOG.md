@@ -20,3 +20,5 @@ All notable changes to this project will be documented in this file.
 - Added PostgreSQL service for users and sessions
 - Added `.env.example` for credential/bootstrap configuration
 - Added GitHub Pages documentation content under `docs/` aligned with README, SECURITY, and CONTRIBUTING
+- Added RBAC role model (`roles`, `user_roles`, `role_app_access`) with app-scoped authorization checks
+- Added admin role-management UI (`/admin/roles`) and user-role assignment controls

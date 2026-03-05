@@ -24,14 +24,15 @@ Include:
 - Password hashing with bcrypt.
 - Nginx `auth_request` gate for protected Shiny routes.
 - Session-based auth with HttpOnly cookies and CSRF protection for state-changing forms.
+- Role-based authorization for per-app access control.
 
 ## Authentication Layer Technical Overview
 
 ### Components and Trust Boundaries
 
 - `gateway` (Nginx) is the only public entrypoint and enforces authentication before traffic reaches protected Shiny routes.
-- `auth-admin` (FastAPI) owns identity logic: login, logout, session validation, and admin CRUD for users.
-- `postgres` stores user records and active sessions.
+- `auth-admin` (FastAPI) owns identity logic: login, logout, session validation, role checks, and admin CRUD for users/roles.
+- `postgres` stores users, roles, role-app grants, user-role mappings, and active sessions.
 - `r-shiny` and `python-shiny` are treated as protected upstream apps and do not implement independent login logic.
 
 ### Route Protection Model
@@ -39,6 +40,7 @@ Include:
 - Protected routes: `/rlang-app/` and `/python-app/`.
 - Nginx uses `auth_request` to call an internal endpoint (`/_auth_check`) that proxies to `auth-admin:/auth/check`.
 - If auth returns `401`, Nginx redirects the client to `/auth/login?next=<original_path>`.
+- If auth returns `403`, Nginx serves `/auth/forbidden` (authenticated but not authorized).
 - If auth returns `200`, Nginx forwards the request to the target Shiny app.
 
 ### NGINX Implementation Notes
@@ -50,6 +52,7 @@ Include:
 - Unauthenticated access to protected routes is handled with `error_page 401 = @auth_signin`, which centralizes redirect behavior.
 - `@auth_signin` preserves target navigation via `?next=$request_uri`.
 - `/auth/*` and `/admin/*` are proxied to `auth-admin`, while `/rlang-app/*` and `/python-app/*` are proxied only after successful auth checks.
+- Nginx app locations map both `401` and `403` explicitly: `401` goes to sign-in redirect and `403` goes to the forbidden page.
 
 ### Session and Credential Handling
 
@@ -58,6 +61,7 @@ Include:
 - Session cookies are configured `HttpOnly`, `SameSite=Lax`, and `Secure` is controlled by `APP_COOKIE_SECURE`.
 - Session identifiers are stored server-side as SHA-256 token hashes (`token_hash`), not raw tokens.
 - Session validity requires all of: active user, existing session row, and non-expired session timestamp.
+- Authorization validity for app routes requires role grant: `admin` users bypass role checks, while non-admin users need `user_roles` membership connected to `role_app_access` for the requested app key.
 
 ### CSRF and Logout Semantics
 
@@ -84,17 +88,20 @@ Login flow details:
 2. Token hash exists in `sessions`.
 3. Session is not expired (`expires_at > NOW()`).
 4. Associated user is still active.
+5. If request targets a protected app, role permission exists for that app.
 
 `/auth/check` response contract:
 
 1. `200` for valid sessions.
 2. `401` for missing, invalid, or expired sessions.
+3. `403` for authenticated users missing required app permission.
 
 User-management safeguards:
 
 1. Prevent deleting/deactivating the last active admin.
 2. Prevent self-delete and self-deactivation for current admin session.
 3. Invalidate all sessions when a user is deactivated.
+4. Role assignment changes take effect immediately for subsequent auth checks.
 
 ### Admin and Safety Constraints
 

@@ -10,7 +10,8 @@ title: Authentication
 2. NGINX issues internal auth subrequest to `/_auth_check`.
 3. `/_auth_check` proxies to `auth-admin:/auth/check`.
 4. If `401`, user is redirected to `/auth/login?next=<original-path>`.
-5. If `200`, request is proxied to target Shiny app.
+5. If `403`, user is sent to `/auth/forbidden` (authenticated but missing role permission).
+6. If `200`, request is proxied to target Shiny app.
 
 ## User-Facing Endpoints
 
@@ -19,6 +20,7 @@ title: Authentication
 - `GET /auth/logout` - logout confirmation page
 - `POST /auth/logout` - CSRF-validated logout, session delete, cookie clear
 - `GET /admin/users` - admin-only user management UI
+- `GET /admin/roles` - admin-only role and permission management UI
 
 ## Session Model
 
@@ -29,6 +31,9 @@ title: Authentication
   - user is active
   - session exists
   - session is unexpired
+- App access is valid only if:
+  - user is admin, or
+  - user has at least one role mapped to the requested app key
 
 ## CSRF Controls
 
@@ -42,6 +47,9 @@ title: Authentication
 ```mermaid
 erDiagram
     USERS ||--o{ SESSIONS : "owns"
+    USERS ||--o{ USER_ROLES : "assigned"
+    ROLES ||--o{ USER_ROLES : "contains users"
+    ROLES ||--o{ ROLE_APP_ACCESS : "grants apps"
 
     USERS {
         BIGSERIAL id PK
@@ -59,6 +67,26 @@ erDiagram
         CHAR(64) token_hash UK
         TEXT csrf_token
         TIMESTAMPTZ expires_at
+        TIMESTAMPTZ created_at
+    }
+
+    ROLES {
+        BIGSERIAL id PK
+        TEXT name UK
+        TEXT description
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    USER_ROLES {
+        BIGINT user_id FK
+        BIGINT role_id FK
+        TIMESTAMPTZ created_at
+    }
+
+    ROLE_APP_ACCESS {
+        BIGINT role_id FK
+        TEXT app_key
         TIMESTAMPTZ created_at
     }
 ```

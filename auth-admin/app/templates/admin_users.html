@@ -12,7 +12,7 @@
         color: #1a1e24;
       }
       .wrap {
-        width: min(1180px, 95vw);
+        width: min(1260px, 96vw);
         margin: 22px auto 28px;
       }
       .topbar {
@@ -60,14 +60,18 @@
       .grid {
         display: grid;
         gap: 10px;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       }
-      input[type="text"], input[type="password"] {
+      input[type="text"], input[type="password"], select, textarea {
         width: 100%;
         box-sizing: border-box;
         border: 1px solid #bfc9d8;
         border-radius: 8px;
         padding: 8px 10px;
+      }
+      textarea {
+        min-height: 66px;
+        resize: vertical;
       }
       label {
         font-weight: 600;
@@ -102,12 +106,15 @@
         width: 100%;
         border-collapse: collapse;
         background: #fff;
+        min-width: 1060px;
       }
       th, td {
         border-bottom: 1px solid #e3e9f2;
         padding: 9px 8px;
         text-align: left;
         vertical-align: top;
+        min-width: 0;
+        word-break: break-word;
       }
       .inline-form {
         display: flex;
@@ -115,16 +122,35 @@
         flex-wrap: wrap;
         align-items: center;
       }
-      .role {
+      .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e3e9f2;
+        border-radius: 10px;
+      }
+      .inline-form select,
+      .inline-form input[type="password"] {
+        flex: 1 1 180px;
+        min-width: 0;
+        width: auto;
+      }
+      .inline-form button {
+        flex: 0 0 auto;
+      }
+      .badge {
         display: inline-block;
         border-radius: 999px;
         padding: 2px 10px;
         font-size: 0.85rem;
         font-weight: 700;
       }
-      .role.admin { background: #d4ecff; color: #00416f; }
-      .role.user { background: #e7efe7; color: #234125; }
-      @media (max-width: 820px) {
+      .badge.admin { background: #d4ecff; color: #00416f; }
+      .badge.user { background: #e7efe7; color: #234125; }
+      .badge.role { background: #e8e3ff; color: #392873; margin: 0 4px 4px 0; }
+      .muted { color: #566278; font-size: 0.93rem; }
+      .roles-cell { width: 32%; }
+      .actions-cell { width: 26%; }
+      @media (max-width: 920px) {
         th:nth-child(4), td:nth-child(4),
         th:nth-child(5), td:nth-child(5) {
           display: none;
@@ -140,12 +166,10 @@
           <div style="color:#4d5b71;">Logged in as <strong>{{ session.username }}</strong></div>
         </div>
         <div class="links">
+          <a href="/admin/roles">Manage Roles</a>
           <a href="/rlang-app/" target="_blank" rel="noreferrer">Open R App</a>
           <a href="/python-app/" target="_blank" rel="noreferrer">Open Python App</a>
-          <form class="logout-form" method="post" action="/auth/logout">
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <button type="submit">Logout</button>
-          </form>
+          <a href="/auth/logout">Logout</a>
         </div>
       </div>
 
@@ -170,9 +194,9 @@
               <input id="create-password" type="password" name="password" minlength="{{ min_password_length }}" required>
             </div>
             <div>
-              <label for="create-admin">Role</label>
+              <label for="create-admin">Privileges</label>
               <div>
-                <label><input id="create-admin" type="checkbox" name="is_admin"> Admin user</label>
+                <label><input id="create-admin" type="checkbox" name="is_admin"> Admin user (global bypass)</label>
               </div>
             </div>
             <div style="display:flex;align-items:flex-end;">
@@ -184,32 +208,66 @@
 
       <section class="panel">
         <h2 style="margin-top:0;">Existing Users</h2>
+        <div class="table-scroll">
         <table>
           <thead>
             <tr>
               <th>Username</th>
-              <th>Role</th>
+              <th>Privilege</th>
               <th>Status</th>
               <th>Created</th>
               <th>Updated</th>
+              <th>Access Roles</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for user in users %}
+            {% set assigned_roles = user_roles_by_user.get(user.id, []) %}
             <tr>
               <td><strong>{{ user.username }}</strong>{% if user.id == session.user_id %} (you){% endif %}</td>
               <td>
                 {% if user.is_admin %}
-                <span class="role admin">admin</span>
+                <span class="badge admin">admin</span>
                 {% else %}
-                <span class="role user">user</span>
+                <span class="badge user">user</span>
                 {% endif %}
               </td>
               <td>{% if user.is_active %}active{% else %}inactive{% endif %}</td>
               <td>{{ user.created_at }}</td>
               <td>{{ user.updated_at }}</td>
-              <td>
+              <td class="roles-cell">
+                <div style="margin-bottom:6px;">
+                  {% if assigned_roles|length == 0 %}
+                  <span class="muted">No roles assigned.</span>
+                  {% else %}
+                    {% for role in assigned_roles %}
+                    <span class="badge role">{{ role.name }}</span>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                <form class="inline-form" method="post" action="/admin/users/{{ user.id }}/roles/add">
+                  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                  <select name="role_id" required>
+                    <option value="">Assign role...</option>
+                    {% for role in roles %}
+                    <option value="{{ role.id }}">{{ role.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="neutral" type="submit">Assign</button>
+                </form>
+                {% if assigned_roles|length > 0 %}
+                <div style="margin-top:6px;">
+                  {% for role in assigned_roles %}
+                  <form class="inline-form" method="post" action="/admin/users/{{ user.id }}/roles/{{ role.id }}/remove" style="display:inline-flex; margin:0 6px 6px 0;">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <button class="warn" type="submit">Remove {{ role.name }}</button>
+                  </form>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </td>
+              <td class="actions-cell">
                 <form class="inline-form" method="post" action="/admin/users/{{ user.id }}/password" style="margin-bottom:6px;">
                   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                   <input type="password" name="password" minlength="{{ min_password_length }}" placeholder="New password" required>
@@ -234,6 +292,7 @@
             {% endfor %}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   </body>
