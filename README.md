@@ -1,6 +1,10 @@
 # Shiny Web Container Template
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18878092.svg)](https://doi.org/10.5281/zenodo.18878092)
+[![Pages Deploy](https://github.com/Bio2Byte/shiny-web-container/actions/workflows/jekyll-gh-pages.yml/badge.svg)](https://github.com/Bio2Byte/shiny-web-container/actions/workflows/jekyll-gh-pages.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-2ea44f?logo=githubpages)](https://bio2byte.github.io/shiny-web-container/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Bio2Byte/shiny-web-container/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Bio2Byte/shiny-web-container)](https://github.com/Bio2Byte/shiny-web-container/releases)
 
 <div align="center">
   <img src="assets/branding/logo.png" alt="Project logo" width="640">
