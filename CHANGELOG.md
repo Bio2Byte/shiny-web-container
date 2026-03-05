@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-03-05
+
+Final stable first version including:
+
+- Authentication layer on top of Nginx (users and roles).
+- Support to Python and R Shiny apps.
+- Documentation and metadata.
+
+### Added
+
+- Github action to build Github Pages using the `docs/` content.
+
 ## [0.1.0] - 2026-03-05
 
 ### Added
