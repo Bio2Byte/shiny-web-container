@@ -1,4 +1,57 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    init: true
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-shiny_auth}
+      POSTGRES_USER: ${POSTGRES_USER:-shiny_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 15s
+    stop_grace_period: 20s
+    restart: unless-stopped
+
+  auth-admin:
+    build:
+      context: .
+      dockerfile: docker/auth-admin/Dockerfile
+    init: true
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-shiny_auth}
+      DB_USER: ${POSTGRES_USER:-shiny_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME:?Set APP_ADMIN_USERNAME in .env}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:?Set APP_ADMIN_PASSWORD in .env}
+      APP_SESSION_COOKIE_NAME: ${APP_SESSION_COOKIE_NAME:-shiny_session}
+      APP_SESSION_TTL_HOURS: ${APP_SESSION_TTL_HOURS:-12}
+      APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
+      APP_MIN_PASSWORD_LENGTH: ${APP_MIN_PASSWORD_LENGTH:-12}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import socket; s = socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 8080)); s.close()"
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+    stop_grace_period: 20s
+    restart: unless-stopped
+
   r-shiny:
     build:
       context: .
@@ -43,6 +96,8 @@ services:
         condition: service_healthy
       python-shiny:
         condition: service_healthy
+      auth-admin:
+        condition: service_healthy
     init: true
     ports:
       - "8000:8000"
@@ -50,3 +105,6 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     stop_grace_period: 10s
     restart: unless-stopped
+
+volumes:
+  postgres-data:

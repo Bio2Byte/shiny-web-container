@@ -21,3 +21,5 @@ venv/
 # Docker / runtime
 *.log
 
+# Local secrets
+.env

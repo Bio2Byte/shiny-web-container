@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Logout | Shiny Auth</title>
+    <style>
+      body {
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(120deg, #f6f8ff 0%, #f7fff9 45%, #fff8f3 100%);
+        color: #1a1e24;
+      }
+      .card {
+        width: min(480px, 92vw);
+        background: #ffffff;
+        border: 1px solid #dbe1ea;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 16px 32px rgba(20, 37, 62, 0.08);
+      }
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 1.4rem;
+      }
+      p {
+        margin: 0 0 16px 0;
+        color: #4d5b71;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      button, a {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .danger {
+        background: #7a1111;
+        color: #fff;
+      }
+      .neutral {
+        background: #ebf0f8;
+        color: #193153;
+      }
+      .primary {
+        background: #0f5132;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      {% if session %}
+      <h1>Logout</h1>
+      <p>You are signed in as <strong>{{ session.username }}</strong>. Confirm to end this session.</p>
+      <div class="actions">
+        <form method="post" action="/auth/logout" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+          <button class="danger" type="submit">Logout Now</button>
+        </form>
+        <a class="neutral" href="/rlang-app/">Cancel</a>
+      </div>
+      {% else %}
+      <h1>Already Logged Out</h1>
+      <p>No active authenticated session was found in this browser.</p>
+      <div class="actions">
+        <a class="primary" href="/auth/login">Go to Login</a>
+      </div>
+      {% endif %}
+    </main>
+  </body>
+</html>

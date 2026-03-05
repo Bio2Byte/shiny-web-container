@@ -21,6 +21,6 @@ Include:
 - No hardcoded credentials in source.
 - Containerized service boundaries.
 - Gateway-only host exposure on port `8000`.
-
-Authentication and PostgreSQL-backed credential checks are planned in the next implementation step.
-
+- Password hashing with bcrypt.
+- Nginx `auth_request` gate for protected Shiny routes.
+- Session-based auth with HttpOnly cookies and CSRF protection for state-changing forms.

@@ -13,3 +13,9 @@ All notable changes to this project will be documented in this file.
 - Docker Compose orchestration for both apps and gateway
 - Repository metadata and governance files
 
+### Changed
+
+- Added authentication gate in Nginx via `auth_request`
+- Added `auth-admin` FastAPI service for login/logout and user CRUD
+- Added PostgreSQL service for users and sessions
+- Added `.env.example` for credential/bootstrap configuration

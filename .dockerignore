@@ -5,3 +5,4 @@ docker-compose.yml
 *.Rproj
 .Rhistory
 .RData
+.env
