@@ -17,6 +17,10 @@ This repository is designed as a template/exhibition project for building contai
 - Python Shiny sample app with:
   - table
   - Plotly scatter plot
+- Runtime hardening:
+  - app-level health checks
+  - gateway waits for healthy backends
+  - graceful stop periods and init process per container
 
 ## Technical Stack (Developer Reference)
 
