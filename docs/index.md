@@ -9,7 +9,9 @@ Production-oriented template for serving multiple Shiny applications behind a si
 - R Shiny app: `/rlang-app`
 - Python Shiny app: `/python-app`
 - Auth UI: `/auth/login`
+- Forbidden UI: `/auth/forbidden`
 - User admin UI: `/admin/users`
+- Role admin UI: `/admin/roles`
 
 ## What This Template Includes
 
@@ -17,8 +19,8 @@ Production-oriented template for serving multiple Shiny applications behind a si
 - NGINX gateway with path-based routing
 - Authentication gate with NGINX `auth_request`
 - FastAPI auth/admin service
-- Role-based access control (RBAC) per Shiny app
-- PostgreSQL user/session persistence
+- Role-based access control (RBAC) for app-level authorization
+- PostgreSQL users/roles/permissions/session persistence
 - Security and governance metadata for publication-ready repos
 
 ## Documentation Map

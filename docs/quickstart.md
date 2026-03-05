@@ -48,3 +48,5 @@ The auth service enforces this admin at startup (upsert in PostgreSQL).
 - Only `gateway` exposes host port `8000`.
 - Application services are internal-only.
 - Protected app routes require authentication before proxy pass.
+- Non-admin users need at least one role granting app access.
+- Admin users bypass role checks for app routes.

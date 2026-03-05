@@ -20,7 +20,7 @@ title: Authentication
 - `GET /auth/logout` - logout confirmation page
 - `POST /auth/logout` - CSRF-validated logout, session delete, cookie clear
 - `GET /admin/users` - admin-only user management UI
-- `GET /admin/roles` - admin-only role and permission management UI
+- `GET /admin/roles` - admin-only role and app-access management UI
 
 ## Session Model
 
@@ -34,6 +34,14 @@ title: Authentication
 - App access is valid only if:
   - user is admin, or
   - user has at least one role mapped to the requested app key
+
+## Role Model
+
+- App keys:
+  - `rlang_app` -> `/rlang-app`
+  - `python_app` -> `/python-app`
+- A non-admin user can open an app only when one of their roles grants that app key.
+- Admin users have global access without role checks.
 
 ## CSRF Controls
 
