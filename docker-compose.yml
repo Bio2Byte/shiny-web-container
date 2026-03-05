@@ -1,0 +1,23 @@
+services:
+  r-shiny:
+    build:
+      context: .
+      dockerfile: docker/r-shiny/Dockerfile
+    restart: unless-stopped
+
+  python-shiny:
+    build:
+      context: .
+      dockerfile: docker/python-shiny/Dockerfile
+    restart: unless-stopped
+
+  gateway:
+    image: nginx:1.27-alpine
+    depends_on:
+      - r-shiny
+      - python-shiny
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped

@@ -1,0 +1,15 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [0.1.0] - 2026-03-05
+
+### Added
+
+- Dual-app architecture:
+  - R Shiny sample app at `/rlang-app`
+  - Python Shiny sample app at `/python-app`
+- Nginx gateway on host port `8000`
+- Docker Compose orchestration for both apps and gateway
+- Repository metadata and governance files
+

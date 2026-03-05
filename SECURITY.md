@@ -1,0 +1,26 @@
+# Security Policy
+
+## Supported Versions
+
+This project currently supports the latest `main` branch.
+
+## Reporting a Vulnerability
+
+Please report suspected vulnerabilities privately to project maintainers.
+Do not open public issues for unpatched vulnerabilities.
+
+Include:
+
+- affected component (R app, Python app, gateway, compose)
+- reproduction steps
+- impact assessment
+- suggested mitigation (if available)
+
+## Security Baseline
+
+- No hardcoded credentials in source.
+- Containerized service boundaries.
+- Gateway-only host exposure on port `8000`.
+
+Authentication and PostgreSQL-backed credential checks are planned in the next implementation step.
+
