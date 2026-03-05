@@ -1,0 +1,14 @@
+title: Shiny Web Container Template Docs
+description: Documentation for the Shiny + Docker + NGINX + Auth/PostgreSQL template stack.
+repository: local/shiny-web-container
+theme: minima
+markdown: kramdown
+kramdown:
+  input: GFM
+header_pages:
+  - index.md
+  - quickstart.md
+  - architecture.md
+  - authentication.md
+  - security.md
+  - contributing.md

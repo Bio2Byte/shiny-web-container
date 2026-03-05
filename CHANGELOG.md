@@ -19,3 +19,4 @@ All notable changes to this project will be documented in this file.
 - Added `auth-admin` FastAPI service for login/logout and user CRUD
 - Added PostgreSQL service for users and sessions
 - Added `.env.example` for credential/bootstrap configuration
+- Added GitHub Pages documentation content under `docs/` aligned with README, SECURITY, and CONTRIBUTING
