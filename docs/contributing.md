@@ -21,8 +21,9 @@ When integrating a new Shiny app in this template:
 2. Add app source and dedicated Dockerfile.
 3. Register service + healthcheck in `docker-compose.yml`.
 4. Add NGINX route and apply auth gate (`auth_request` + `401` redirect).
-5. Update docs and changelog.
-6. Verify login-protected access and logout behavior.
+5. Register app key in RBAC mapping (`APP_ACCESS_OPTIONS` and app-path extraction in auth app).
+6. Update docs and changelog.
+7. Verify login-protected access, role-based authorization, and logout behavior.
 
 ## PR Checklist
 

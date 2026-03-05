@@ -17,6 +17,7 @@ Production-oriented template for serving multiple Shiny applications behind a si
 - NGINX gateway with path-based routing
 - Authentication gate with NGINX `auth_request`
 - FastAPI auth/admin service
+- Role-based access control (RBAC) per Shiny app
 - PostgreSQL user/session persistence
 - Security and governance metadata for publication-ready repos
 

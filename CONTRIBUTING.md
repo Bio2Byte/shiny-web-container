@@ -88,8 +88,17 @@ Required behavior:
 2. `location /my-new-app/` should proxy to the new service
 3. protected routes should include `auth_request /_auth_check;`
 4. protected routes should include `error_page 401 = @auth_signin;`
+5. protected routes should include `error_page 403 = /auth/forbidden;`
 
 Follow existing proxy settings (`proxy_http_version`, `Upgrade`, `Connection`, `Host`, `proxy_read_timeout`, `proxy_buffering`).
+
+### 5.1 Register RBAC App Key
+
+If the app is protected by role-based access, update `auth-admin/app/main.py`:
+
+1. add app key and label to `APP_ACCESS_OPTIONS`
+2. extend `_extract_requested_app_key` route mapping
+3. ensure role-permission seed logic includes a default role for the new app (optional but recommended)
 
 ### 6. Update Documentation
 
@@ -100,6 +109,7 @@ Update all developer-facing docs:
 3. `README.md`: update auth flow notes if behavior differs.
 4. `CHANGELOG.md`: add an entry for the new app integration.
 5. `SECURITY.md`: update only if schema/auth behavior changed.
+6. `docs/authentication.md`: update RBAC/ER sections for any auth schema changes.
 
 ### 7. Validate End-to-End
 

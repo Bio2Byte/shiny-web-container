@@ -10,7 +10,8 @@ title: Architecture
 |---|---|---|
 | Gateway | NGINX | Single public entrypoint (`:8000`), routing + auth checks |
 | Auth/Admin | FastAPI + Jinja | Login/logout, session checks, user CRUD |
-| Persistence | PostgreSQL 16 | Users and sessions |
+| RBAC | Roles + role-app mappings | Restricts specific Shiny apps to authorized user groups |
+| Persistence | PostgreSQL 16 | Users, roles, role grants, and sessions |
 | App 1 | R Shiny + Plotly | Sample analytics app at `/rlang-app` |
 | App 2 | Python Shiny + Plotly/Pandas | Sample analytics app at `/python-app` |
 | Orchestration | Docker Compose | Service lifecycle and network |

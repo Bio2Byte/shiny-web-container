@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Role Admin | Shiny Auth</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background: #f4f7fb;
+        color: #1a1e24;
+      }
+      .wrap {
+        width: min(1220px, 96vw);
+        margin: 22px auto 28px;
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .links {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .links a {
+        text-decoration: none;
+        border: 1px solid #b8c5da;
+        border-radius: 10px;
+        background: #fff;
+        color: #0f2748;
+        padding: 8px 10px;
+        font-weight: 600;
+      }
+      .panel {
+        background: #fff;
+        border: 1px solid #dbe1ea;
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+      .grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+      input[type="text"], textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #bfc9d8;
+        border-radius: 8px;
+        padding: 8px 10px;
+      }
+      textarea {
+        min-height: 66px;
+        resize: vertical;
+      }
+      label {
+        font-weight: 600;
+      }
+      .checkgroup label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .primary { background: #0f5132; color: #fff; }
+      .neutral { background: #23426d; color: #fff; }
+      .danger { background: #7a1111; color: #fff; }
+      .msg {
+        border-radius: 10px;
+        padding: 9px 11px;
+        margin-bottom: 10px;
+      }
+      .msg.ok {
+        border: 1px solid #bbe3c0;
+        background: #effcf1;
+        color: #165c1f;
+      }
+      .msg.err {
+        border: 1px solid #ffc9c9;
+        background: #fff2f2;
+        color: #7f1a1a;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        min-width: 980px;
+      }
+      th, td {
+        border-bottom: 1px solid #e3e9f2;
+        padding: 9px 8px;
+        text-align: left;
+        vertical-align: top;
+        min-width: 0;
+        word-break: break-word;
+      }
+      .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e3e9f2;
+        border-radius: 10px;
+      }
+      .muted { color: #566278; font-size: 0.93rem; }
+      .badge {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 2px 10px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        background: #e8e3ff;
+        color: #392873;
+        margin-right: 6px;
+        margin-bottom: 4px;
+      }
+      .inline-form {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .actions {
+        width: 34%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <div>
+          <h1 style="margin:0;">Role Administration</h1>
+          <div style="color:#4d5b71;">Create, edit, and remove access roles for Shiny applications.</div>
+        </div>
+        <div class="links">
+          <a href="/admin/users">Manage Users</a>
+          <a href="/rlang-app/" target="_blank" rel="noreferrer">Open R App</a>
+          <a href="/python-app/" target="_blank" rel="noreferrer">Open Python App</a>
+          <a href="/auth/logout">Logout</a>
+        </div>
+      </div>
+
+      {% if message %}
+      <div class="msg ok">{{ message }}</div>
+      {% endif %}
+      {% if error %}
+      <div class="msg err">{{ error }}</div>
+      {% endif %}
+
+      <section class="panel">
+        <h2 style="margin-top:0;">Create Role</h2>
+        <form method="post" action="/admin/roles/create">
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+          <div class="grid">
+            <div>
+              <label for="create-role-name">Role name</label>
+              <input id="create-role-name" type="text" name="role_name" placeholder="e.g. data_science" required>
+              <div class="muted">Allowed chars: lowercase letters, numbers, `_`, `-`.</div>
+            </div>
+            <div>
+              <label for="create-role-description">Description</label>
+              <textarea id="create-role-description" name="description" placeholder="Role purpose"></textarea>
+            </div>
+            <div>
+              <label>App access</label>
+              <div class="checkgroup">
+                {% for app_key, app_label in app_access_options %}
+                <label><input type="checkbox" name="app_keys" value="{{ app_key }}"> {{ app_label }}</label>
+                {% endfor %}
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button class="primary" type="submit">Create role</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2 style="margin-top:0;">Existing Roles</h2>
+        <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>App Access</th>
+              <th>Assigned Users</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for role in roles %}
+            <tr>
+              <td><strong>{{ role.name }}</strong></td>
+              <td>{{ role.description or "-" }}</td>
+              <td>
+                {% if role.app_labels|length == 0 %}
+                <span class="muted">No app access</span>
+                {% else %}
+                  {% for app_label in role.app_labels %}
+                  <span class="badge">{{ app_label }}</span>
+                  {% endfor %}
+                {% endif %}
+              </td>
+              <td>{{ role.user_count }}</td>
+              <td class="actions">
+                <form method="post" action="/admin/roles/{{ role.id }}/update" style="margin-bottom:8px;">
+                  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                  <div class="grid" style="grid-template-columns:1fr; gap:6px;">
+                    <input type="text" name="role_name" value="{{ role.name }}" required>
+                    <textarea name="description">{{ role.description }}</textarea>
+                    <div class="checkgroup">
+                      {% for app_key, app_label in app_access_options %}
+                      <label>
+                        <input type="checkbox" name="app_keys" value="{{ app_key }}" {% if app_key in role.app_keys %}checked{% endif %}>
+                        {{ app_label }}
+                      </label>
+                      {% endfor %}
+                    </div>
+                    <div>
+                      <button class="neutral" type="submit">Update role</button>
+                    </div>
+                  </div>
+                </form>
+                <form class="inline-form" method="post" action="/admin/roles/{{ role.id }}/delete">
+                  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                  <button class="danger" type="submit" onclick="return confirm('Delete role {{ role.name }}?');">Delete role</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

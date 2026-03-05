@@ -1,5 +1,9 @@
 # Shiny Web Container Template
 
+<div align="center">
+  <img src="assets/branding/logo.png" alt="Project logo" width="640">
+</div>
+
 Production-style boilerplate for running two sample Shiny applications behind a single gateway on port `8000`:
 
 - R Shiny app at `/rlang-app`
@@ -27,7 +31,8 @@ This repository is designed as a template/exhibition project for building contai
   - NGINX `auth_request` gate in front of both Shiny apps
   - FastAPI auth service for login/session validation
   - PostgreSQL for users and sessions
-  - Admin CRUD UI for user management
+  - RBAC roles with app-scoped access policies
+  - Admin UIs for user and role management
 
 ## Technical Stack (Developer Reference)
 
@@ -37,7 +42,7 @@ This repository is designed as a template/exhibition project for building contai
 | Gateway / routing | Nginx (`nginx:1.27-alpine`) | Single public entrypoint on `:8000`, path-based routing to multiple apps |
 | R web app | Shiny for R + Plotly | Interactive R dashboard sample with table + scatter plot |
 | Python web app | Shiny for Python + Plotly + Pandas | Interactive Python dashboard sample with table + scatter plot |
-| Auth and admin | FastAPI + Jinja templates | Login/logout, session checks, and admin CRUD for users |
+| Auth and admin | FastAPI + Jinja templates | Login/logout, session checks, role CRUD, and user-role assignments |
 | Persistence | PostgreSQL 16 | Stores users and active sessions |
 | Base runtime images | `rocker/r-ver:4.4.1`, `python:3.12-slim` | Stable language runtimes for reproducible local/dev containers |
 
@@ -106,7 +111,9 @@ docker compose up --build
 
 - <http://localhost:8000/auth/login>
 - <http://localhost:8000/auth/logout>
+- <http://localhost:8000/auth/forbidden>
 - <http://localhost:8000/admin/users>
+- <http://localhost:8000/admin/roles>
 - <http://localhost:8000/rlang-app>
 - <http://localhost:8000/python-app>
 
@@ -115,7 +122,7 @@ docker compose up --build
 - Username: value of `APP_ADMIN_USERNAME` from `.env`
 - Password: value of `APP_ADMIN_PASSWORD` from `.env`
 
-The auth service enforces this bootstrap admin user on startup by update/inserting it in PostgreSQL.
+The auth service enforces this bootstrap admin user on startup by upserting it in PostgreSQL.
 
 ## Authentication Layer Usage
 
@@ -126,15 +133,22 @@ The auth service enforces this bootstrap admin user on startup by update/inserti
 3. If no valid session cookie exists, you are redirected to `/auth/login?next=<original-path>`.
 4. Submit credentials on `/auth/login`.
 5. On success, the auth service sets the session cookie and redirects back to `next`.
+6. For protected apps, `/auth/check` enforces role-based access:
+7. `admin` users are always allowed.
+8. non-admin users require a role granting that app (`rlang_app` or `python_app`).
+9. missing permission returns `403` and lands on `/auth/forbidden`.
 
 ### Admin Operations
 
-Use `/admin/users` (admin-only) to:
+Use `/admin/users` and `/admin/roles` (admin-only) to:
 
 - create users
 - set/reset user passwords
 - activate/deactivate users
 - delete users (except your own account)
+- create/edit/delete roles
+- bind each role to one or more Shiny apps
+- assign/remove roles for users
 
 ### Logout
 
@@ -156,6 +170,9 @@ Use `/admin/users` (admin-only) to:
 ```mermaid
 erDiagram
     USERS ||--o{ SESSIONS : "owns"
+    USERS ||--o{ USER_ROLES : "assigned"
+    ROLES ||--o{ USER_ROLES : "contains users"
+    ROLES ||--o{ ROLE_APP_ACCESS : "grants apps"
 
     USERS {
         BIGSERIAL id PK
@@ -173,6 +190,26 @@ erDiagram
         CHAR(64) token_hash UK
         TEXT csrf_token
         TIMESTAMPTZ expires_at
+        TIMESTAMPTZ created_at
+    }
+
+    ROLES {
+        BIGSERIAL id PK
+        TEXT name UK
+        TEXT description
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    USER_ROLES {
+        BIGINT user_id FK
+        BIGINT role_id FK
+        TIMESTAMPTZ created_at
+    }
+
+    ROLE_APP_ACCESS {
+        BIGINT role_id FK
+        TEXT app_key
         TIMESTAMPTZ created_at
     }
 ```
