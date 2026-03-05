@@ -1,6 +1,5 @@
-title: Shiny Web Container Template Docs
+title: Bio2Byte's Shiny Web Container Template Docs
 description: Documentation for the Shiny + Docker + NGINX + Auth/PostgreSQL template stack.
-repository: local/shiny-web-container
 theme: minima
 markdown: kramdown
 kramdown:

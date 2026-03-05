@@ -279,3 +279,14 @@ docker compose --profile docs rm -f docs-preview
 - Code of Conduct: `CODE_OF_CONDUCT.md`
 - Security policy: `SECURITY.md`
 - Changelog: `CHANGELOG.md`
+
+## Developed By
+
+Developed by Bio2Byte in Belgium: "We research the relation between protein sequence and biophysical behavior."
+
+Reach us out:
+
+- Official website: [bio2byte.be](https://bio2byte.be)
+- Official GitHub organisation: [github.com/bio2byte](https://github.com/bio2byte)
+- LinkedIn page: [Bio2Byte](https://www.linkedin.com/company/bio2byte/)
+- Email: [bio2byte@vub.be](mailto:bio2byte@vub.be)

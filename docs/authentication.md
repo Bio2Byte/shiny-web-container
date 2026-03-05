@@ -50,6 +50,24 @@ title: Authentication
   - logout
   - admin create/update/delete/toggle actions
 
+## Authentication Flow Screenshots
+
+### Login Form
+
+![Login page](assets/screenshots/02-login-page.png)
+
+### Invalid Credentials
+
+![Invalid login](assets/screenshots/03-login-invalid-credentials.png)
+
+### User-Role Assignment
+
+![User role assignment](assets/screenshots/07-user-role-assignment.png)
+
+### Forbidden Access (Missing Role Permission)
+
+![Forbidden page](assets/screenshots/10-forbidden-page.png)
+
 ## Auth Schema (ER)
 
 ```mermaid
@@ -98,3 +116,7 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 ```
+
+Rendered example:
+
+![Auth ER diagram rendered](assets/screenshots/14-auth-er-diagram-rendered.png)

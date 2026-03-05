@@ -32,6 +32,16 @@ This page summarizes the implemented security model. Full policy and detailed no
 - Last-active-admin protection on destructive admin operations
 - Session invalidation on user deactivation
 
+## Security-Relevant UI States
+
+### Access Denied (Authorization Failure)
+
+![Forbidden page](assets/screenshots/10-forbidden-page.png)
+
+### Role Policy Administration
+
+![Role admin page](assets/screenshots/05-admin-roles-page.png)
+
 ## Production Expectations
 
 - Use HTTPS and set `APP_COOKIE_SECURE=true`
