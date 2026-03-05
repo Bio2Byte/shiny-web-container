@@ -106,5 +106,38 @@ services:
     stop_grace_period: 10s
     restart: unless-stopped
 
+  docs-preview:
+    platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: docker/docs-preview/Dockerfile
+    profiles:
+      - docs
+    init: true
+    working_dir: /srv/jekyll
+    command:
+      - jekyll
+      - serve
+      - --source
+      - /srv/jekyll/docs
+      - --destination
+      - /tmp/.jekyll-site
+      - --host
+      - 0.0.0.0
+      - --port
+      - "4000"
+      - --livereload
+      - --force_polling
+    environment:
+      JEKYLL_ENV: development
+      JEKYLL_CACHE_DIR: /tmp/.jekyll-cache
+      PAGES_REPO_NWO: ${PAGES_REPO_NWO:-local/shiny-web-container}
+    volumes:
+      - ./docs:/srv/jekyll/docs
+    ports:
+      - "4000:4000"
+      - "35729:35729"
+    restart: unless-stopped
+
 volumes:
   postgres-data:

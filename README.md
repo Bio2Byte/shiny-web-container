@@ -191,8 +191,39 @@ erDiagram
 ├── auth-admin
 │   ├── app/main.py
 │   └── app/templates/*.html
+├── docs
+│   ├── _config.yml
+│   ├── index.md
+│   ├── quickstart.md
+│   ├── architecture.md
+│   ├── authentication.md
+│   ├── security.md
+│   └── contributing.md
 ├── python-app/app.py
 └── rlang-app/app.R
+```
+
+## GitHub Pages
+
+Project documentation pages are under `docs/` and are intended for GitHub Pages publishing.
+
+### Local Preview (Before Commit)
+
+Run GitHub Pages-compatible local preview with Jekyll:
+
+```bash
+docker compose --profile docs up -d --build docs-preview
+```
+
+Open:
+
+- <http://localhost:4000>
+
+Stop preview:
+
+```bash
+docker compose --profile docs stop docs-preview
+docker compose --profile docs rm -f docs-preview
 ```
 
 ## Security Notes
