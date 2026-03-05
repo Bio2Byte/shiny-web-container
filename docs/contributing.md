@@ -20,8 +20,8 @@ When integrating a new Shiny app in this template:
 1. Choose unique route and service name.
 2. Add app source and dedicated Dockerfile.
 3. Register service + healthcheck in `docker-compose.yml`.
-4. Add NGINX route and apply auth gate (`auth_request` + `401` redirect).
-5. Register app key in RBAC mapping (`APP_ACCESS_OPTIONS` and app-path extraction in auth app).
+4. Add NGINX route and apply auth gate (`auth_request` + `401` redirect + `403` forbidden).
+5. Register app key in auth RBAC mapping (`APP_ACCESS_OPTIONS` and app-path extraction).
 6. Update docs and changelog.
 7. Verify login-protected access, role-based authorization, and logout behavior.
 
@@ -30,5 +30,6 @@ When integrating a new Shiny app in this template:
 - Service is healthy in `docker compose ps`
 - Route works through `gateway` only
 - Unauthenticated access redirects to login
+- Unauthorized (no role grant) access lands on forbidden page
 - Authenticated access reaches app
 - Security/docs updates included when relevant

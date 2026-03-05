@@ -28,9 +28,19 @@ This page summarizes the implemented security model. Full policy and detailed no
 
 - Parameterized SQL (`psycopg`) for DB interactions
 - Bootstrap admin managed from environment variables
-- Role tables (`roles`, `user_roles`, `role_app_access`) control app-level permissions
+- Role tables (`roles`, `user_roles`, `role_app_access`) control per-app authorization
 - Last-active-admin protection on destructive admin operations
 - Session invalidation on user deactivation
+
+## Security-Relevant UI States
+
+### Access Denied (Authorization Failure)
+
+![Forbidden page](assets/screenshots/10-forbidden-page.png)
+
+### Role Policy Administration
+
+![Role admin page](assets/screenshots/05-admin-roles-page.png)
 
 ## Production Expectations
 

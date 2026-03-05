@@ -20,7 +20,7 @@ title: Authentication
 - `GET /auth/logout` - logout confirmation page
 - `POST /auth/logout` - CSRF-validated logout, session delete, cookie clear
 - `GET /admin/users` - admin-only user management UI
-- `GET /admin/roles` - admin-only role and permission management UI
+- `GET /admin/roles` - admin-only role and app-access management UI
 
 ## Session Model
 
@@ -35,12 +35,38 @@ title: Authentication
   - user is admin, or
   - user has at least one role mapped to the requested app key
 
+## Role Model
+
+- App keys:
+  - `rlang_app` -> `/rlang-app`
+  - `python_app` -> `/python-app`
+- A non-admin user can open an app only when one of their roles grants that app key.
+- Admin users have global access without role checks.
+
 ## CSRF Controls
 
 - State-changing requests require a CSRF token.
 - Covered operations:
   - logout
   - admin create/update/delete/toggle actions
+
+## Authentication Flow Screenshots
+
+### Login Form
+
+![Login page](assets/screenshots/02-login-page.png)
+
+### Invalid Credentials
+
+![Invalid login](assets/screenshots/03-login-invalid-credentials.png)
+
+### User-Role Assignment
+
+![User role assignment](assets/screenshots/07-user-role-assignment.png)
+
+### Forbidden Access (Missing Role Permission)
+
+![Forbidden page](assets/screenshots/10-forbidden-page.png)
 
 ## Auth Schema (ER)
 
@@ -90,3 +116,7 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 ```
+
+Rendered example:
+
+![Auth ER diagram rendered](assets/screenshots/14-auth-er-diagram-rendered.png)
