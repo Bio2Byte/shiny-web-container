@@ -1,5 +1,7 @@
 # Shiny Web Container Template
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18878092.svg)](https://doi.org/10.5281/zenodo.18878092)
+
 <div align="center">
   <img src="assets/branding/logo.png" alt="Project logo" width="640">
 </div>
